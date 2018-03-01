@@ -40,7 +40,8 @@ def getNeighbors(nth: Int = 0,
            nth+1,
            getNeighbors(nth+1, newVisited, neighbor.xFinish, neighbor.yFinish, nextActualEndTime),
             nextActualStart,
-            nextActualEndTime)
+            nextActualEndTime,
+           )
     }
   }
 }
@@ -53,12 +54,38 @@ object Utils {
   def distTimeBetween(r1: Ride, r2: Ride) = distTime(r1.xFinish, r1.yFinish, r2.xStart, r2.yStart)
 }
 
-case class Node(ride: Ride, nth: Int, neighbours: Set[Node], actualStartTime: Int, actualEndTime: Int) {
+case class Node(ride: Ride, nth: Int, neighbours: Set[Node], actualStartTime: Int, actualEndTime: Int, score: Int) {
   override def toString(): String = {
     s"""
        | $ride $nth $actualEndTime $actualEndTime
        |   $neighbours
      """.stripMargin
+  }
+
+  def evaluateNeighbor(neighbor: Node)(implicit input: Input): Int = {
+    val ride = neighbor.ride
+    val bonus =
+      if (actualStartTime <= ride.earliestStart)
+        input.perRideBonusOnStart
+      else
+        0
+
+    val rideValue = ride.distTime
+    if (actualEndTime <= ride.latestFinish)
+      (bonus + rideValue)
+    else 0
+  }
+}
+
+object Dijkstra {
+  val Priority
+
+  def maxPath(graph : Set[Node]): Set[Node] = {
+    graph.map {
+      node =>
+        node.neighbours.map()
+
+    }
   }
 }
 
