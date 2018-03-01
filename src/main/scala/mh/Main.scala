@@ -6,9 +6,20 @@ import scala.io.Source
 
 case class Ride(xStart: Int, yStart: Int, xFinish: Int, yFinish: Int, earliestStart: Int, latestFinish: Int){
   def distTime = Utils.distTime(xStart, yStart, xFinish, yFinish)
+
+  override def toString: String = s"[tc = ${distTime}, start = ${earliestStart}, finish = ${latestFinish} ]"
 }
 case class Input(numRows: Int, numCols: Int, numVehicles: Int, numRides: Int, perRideBonusOnStart: Int, numSteps: Int,
-                 rides: Vector[Ride])
+                 rides: Vector[Ride]){
+  override def toString: String =
+    s"""${numVehicles} vehicles
+      |${numRides} rides
+      |${perRideBonusOnStart} perRideBonusOnStart
+      |${numSteps} steps
+      |
+      |${rides.mkString("\n")}
+      |""".stripMargin
+}
 
 object Utils {
 
