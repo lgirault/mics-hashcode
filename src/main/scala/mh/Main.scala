@@ -22,34 +22,26 @@ case class Input(numRows: Int, numCols: Int, numVehicles: Int, numRides: Int, pe
 
   lazy  val ridesSet: Set[Ride] = rides.toSet
 
-  def graph(nth: Int = 0, visited: Set[Ride] = Set.empty,
-            currentX: Int = 0,
-            currentY: Int = 0,
-            currentTime: Int = 0) : Set[Node] =
+def getNeighbors(nth: Int = 0,
+                 visited: Set[Ride] = Set.empty,
+                 currentX: Int = 0,
+                 currentY: Int = 0,
+                 currentTime: Int = 0) : Set[Node] =
   if(nth >= numRides) Set.empty
   else {
-
     for {
-      r <- ridesSet -- visited
+      neighbor <- ridesSet -- visited
     } yield {
-
-
-      val newVisited = visited + r
-      val nexts = (ridesSet -- newVisited).map {
-        n =>
-          val goTo = Utils.distTime(currentX, currentY, r.xStart, r.yStart)
-
-          val nextActualStart = Math.max(currentTime + goTo, n.earliestStart)
-          val nextActualEndTime = nextActualStart + n.distTime
-          Node(n, nth,
-            graph(nth + 1, newVisited, n.xFinish, n.yFinish,
-              currentTime + goTo + n.distTime),
+      val newVisited = visited + neighbor
+      val goTo = Utils.distTime(currentX, currentY, neighbor.xStart, neighbor.yStart)
+      val nextActualStart = Math.max(currentTime + goTo, neighbor.earliestStart)
+      val nextActualEndTime = nextActualStart + neighbor.distTime
+      Node(neighbor,
+           nth+1,
+           getNeighbors(nth+1, newVisited, neighbor.xFinish, neighbor.yFinish, nextActualEndTime),
             nextActualStart,
             nextActualEndTime)
-      }
-      Node(r, nth, nexts)
     }
-
   }
 }
 
@@ -61,7 +53,14 @@ object Utils {
   def distTimeBetween(r1: Ride, r2: Ride) = distTime(r1.xFinish, r1.yFinish, r2.xStart, r2.yStart)
 }
 
-case class Node(r: Ride, nth: Int, neighbours: Set[Node], actualStartTime: Int, actualEndTime: Int)
+case class Node(ride: Ride, nth: Int, neighbours: Set[Node], actualStartTime: Int, actualEndTime: Int) {
+  override def toString(): String = {
+    s"""
+       | $ride $nth $actualEndTime $actualEndTime
+       |   $neighbours
+     """.stripMargin
+  }
+}
 
 object Main {
 
@@ -89,6 +88,6 @@ object Main {
     val exUrl = getClass.getClassLoader.getResource("a_example.in")
     val input = read(exUrl.toURI)
 
-    println(input.graph().mkString("\n"))
+    println(input.getNeighbors().mkString("\n"))
   }
 }
